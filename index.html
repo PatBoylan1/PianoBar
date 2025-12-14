@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Songs List</title>
+<style>
+  body {
+    font-family: sans-serif;
+    padding: 20px;
+    margin: 0;
+    background: #fff;
+    color: #000;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  th {
+    text-align: left;
+    font-weight: bold;
+    padding: 12px 8px;
+    border-bottom: 2px solid #ddd;
+  }
+
+  td {
+    padding: 12px 8px;
+  }
+
+  a.button {
+    padding: 4px 8px;
+    border: 1px solid #000;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #000;
+  }
+
+  a.button:active {
+    background: #ddd;
+  }
+
+  @media (max-width: 600px) {
+    td, th { padding: 8px 4px; }
+  }
+</style>
+</head>
+<body>
+
+<table id="songs-table">
+  <thead>
+    <tr>
+      <th>Song Title</th>
+      <th>Artist / Show</th>
+      <th></th> <!-- No header for Request -->
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Tiny Dancer</td>
+      <td>Elton John</td>
+      <td><a class="button" href="https://venmo.com/patrickTSG?txn=pay&amount=5&note=Tiny-Dancer-Elton-John">Request</a></td>
+    </tr>
+    <tr>
+      <td>Defying Gravity</td>
+      <td>Wicked</td>
+      <td><a class="button" href="https://venmo.com/patrickTSG?txn=pay&amount=5&note=Defying-Gravity-Wicked">Request</a></td>
+    </tr>
+    <tr>
+      <td>Shallow</td>
+      <td>Lady Gaga</td>
+      <td><a class="button" href="https://venmo.com/patrickTSG?txn=pay&amount=5&note=Shallow-Lady-Gaga">Request</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<script>
+// Auto-sort songs by title
+const tableBody = document.getElementById("songs-table").tBodies[0];
+[...tableBody.rows]
+  .sort((a,b) => a.cells[0].textContent.localeCompare(b.cells[0]))
+  .forEach(row => tableBody.appendChild(row));
+</script>
+
+</body>
+</html>
