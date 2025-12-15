@@ -139,7 +139,9 @@
             height: calc(100vh - 450px); /* Fixed height: viewport minus header/filters/search */
             overflow-y: auto; /* Internal scrolling */
             overflow-x: hidden;
-            padding-bottom: 150px; /* Extra space for keyboard clearance (10 rows × 50px) */
+            padding-bottom: 150px; /* Extra space for keyboard clearance (~3 rows) */
+            overscroll-behavior: none; /* Prevent bounce effect at scroll boundaries */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         }
 
         .songlist-table thead {
