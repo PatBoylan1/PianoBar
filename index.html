@@ -358,17 +358,9 @@
 <body>
     <h1>Patrick Boylan's Song List</h1>
 
-    <!-- Filter Buttons -->
-    <div class="filter-buttons">
-        <button class="filter-btn active" data-filter="all">All Songs</button>
-        <button class="filter-btn" data-filter="Musicals">Musicals</button>
-        <button class="filter-btn" data-filter="Classic Piano Bar Tunes">Classic Piano Bar Tunes</button>
-        <button class="filter-btn" data-filter="Disney">Disney</button>
-        <button class="filter-btn" data-filter="2000-Present">2000-Present</button>
-        <button class="filter-btn" data-filter="90's">90's</button>
-        <button class="filter-btn" data-filter="60's-80's">60's-80's</button>
-        <button class="filter-btn" data-filter="Jazz">Jazz</button>
-        <button class="filter-btn" data-filter="Holiday">Holiday</button>
+    <!-- Filter Buttons (dynamically generated) -->
+    <div class="filter-buttons" id="filterButtons">
+        <!-- Filters will be generated from JSON categories -->
     </div>
 
     <!-- Search Bar -->
@@ -647,11 +639,62 @@
             return results.map(r => r.song);
         }
 
+        // Generate filter buttons dynamically from unique categories
+        function generateFilterButtons() {
+            const filterContainer = document.getElementById('filterButtons');
+            
+            // Get unique categories from all songs
+            const categories = new Set();
+            allSongs.forEach(song => {
+                if (song.tags && Array.isArray(song.tags)) {
+                    song.tags.forEach(tag => categories.add(tag));
+                }
+            });
+            
+            // Convert to sorted array
+            const sortedCategories = Array.from(categories).sort();
+            
+            // Clear existing buttons
+            filterContainer.innerHTML = '';
+            
+            // Add "All Songs" button first
+            const allButton = document.createElement('button');
+            allButton.className = 'filter-btn active';
+            allButton.setAttribute('data-filter', 'all');
+            allButton.textContent = 'All Songs';
+            filterContainer.appendChild(allButton);
+            
+            // Add category buttons
+            sortedCategories.forEach(category => {
+                const button = document.createElement('button');
+                button.className = 'filter-btn';
+                button.setAttribute('data-filter', category);
+                button.textContent = category;
+                filterContainer.appendChild(button);
+            });
+            
+            // Set up click handlers for all filter buttons
+            document.querySelectorAll('.filter-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active state
+                    document.querySelectorAll('.filter-btn').forEach(btn => 
+                        btn.classList.remove('active')
+                    );
+                    this.classList.add('active');
+
+                    // Update filter and re-render
+                    currentFilter = this.getAttribute('data-filter');
+                    renderSongs();
+                });
+            });
+        }
+
         // Load songs from JSON
         async function loadSongs() {
             try {
                 const response = await fetch('songs.json');
                 allSongs = await response.json();
+                generateFilterButtons(); // Generate filters after loading songs
                 renderSongs();
             } catch (error) {
                 console.error('Error loading songs:', error);
@@ -842,21 +885,6 @@
                 requestAnimationFrame(momentumScroll);
             }
         }, { passive: true });
-
-        // Filter button click handlers
-        document.querySelectorAll('.filter-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                // Update active state
-                document.querySelectorAll('.filter-btn').forEach(btn => 
-                    btn.classList.remove('active')
-                );
-                this.classList.add('active');
-
-                // Update filter and re-render
-                currentFilter = this.getAttribute('data-filter');
-                renderSongs();
-            });
-        });
 
         // Custom notification function (replaces alert to avoid domain prefix)
         function showNotification(message, duration = 3000) {
