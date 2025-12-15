@@ -732,6 +732,19 @@
 
         const searchInput = document.getElementById('searchInput');
 
+        // Add extra scroll on focus to show more of the table
+        searchInput.addEventListener('focus', function() {
+            // Wait for browser's default scroll-into-view to complete
+            setTimeout(() => {
+                // Scroll up an additional 100px to show more table
+                const currentScroll = window.pageYOffset;
+                window.scrollTo({
+                    top: currentScroll - 100,
+                    behavior: 'smooth'
+                });
+            }, 400); // Wait for keyboard animation
+        });
+
         // Live search - filter as user types
         searchInput.addEventListener('input', function() {
             currentSearchTerm = this.value;
