@@ -157,7 +157,7 @@
         @media (max-width: 768px) {
             body {
                 overflow-x: hidden;
-                overflow-y: hidden; /* Prevent page scroll on mobile */
+                /* Allow page scroll for scroll chaining */
             }
             
             .songlist-wrapper {
@@ -567,6 +567,49 @@
                 window.scrollTo(0, scrollPosition);
             }
         });
+
+        // Scroll chaining: Allow page scroll when tbody reaches top
+        const tbody = document.getElementById('songBody');
+        let lastScrollTop = 0;
+        
+        tbody.addEventListener('scroll', function(e) {
+            const currentScrollTop = this.scrollTop;
+            const scrollingUp = currentScrollTop < lastScrollTop;
+            
+            // If scrolling up and at the top of tbody, allow page scroll
+            if (scrollingUp && currentScrollTop === 0) {
+                // Don't prevent default - allow scroll to chain to page
+                return;
+            }
+            
+            lastScrollTop = currentScrollTop;
+        }, { passive: true });
+        
+        // Handle touch events for smooth scroll chaining on mobile
+        let touchStartY = 0;
+        let tbodyScrollTop = 0;
+        
+        tbody.addEventListener('touchstart', function(e) {
+            touchStartY = e.touches[0].clientY;
+            tbodyScrollTop = this.scrollTop;
+        }, { passive: true });
+        
+        tbody.addEventListener('touchmove', function(e) {
+            const touchY = e.touches[0].clientY;
+            const touchDelta = touchY - touchStartY;
+            const scrollingUp = touchDelta > 0;
+            
+            // If at top of tbody and trying to scroll up, allow page scroll
+            if (this.scrollTop === 0 && scrollingUp) {
+                // Don't prevent - allow scroll to chain to page
+                return;
+            }
+            
+            // Otherwise, prevent page scroll while tbody is scrolling
+            if (this.scrollTop > 0 || !scrollingUp) {
+                e.preventDefault();
+            }
+        }, { passive: false });
 
         // Filter button click handlers
         document.querySelectorAll('.filter-btn').forEach(button => {
