@@ -317,9 +317,10 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             z-index: 10000;
             text-align: center;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
-            max-width: 90%;
+            max-width: 95%;
+            width: auto;
             line-height: 1.3;
             animation: fadeIn 0.3s ease-in-out;
         }
@@ -732,20 +733,27 @@
         searchInput.addEventListener('focus', function() {
             // Only auto-scroll on mobile (screen width < 768px)
             if (window.innerWidth < 768 && !isSearchActive) {
-                // Android-specific: Use direct DOM manipulation with multiple attempts
+                // Calculate absolute position of search container from top of page
                 const scrollToTop = () => {
-                    const rect = searchContainer.getBoundingClientRect();
-                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                    const targetPosition = rect.top + scrollTop - 80; // Scroll higher (80px from top)
+                    // Get the absolute offset from top of document
+                    let element = searchContainer;
+                    let offsetTop = 0;
+                    while (element) {
+                        offsetTop += element.offsetTop;
+                        element = element.offsetParent;
+                    }
                     
-                    // Try all methods simultaneously for Android
+                    // Target position: absolute offset minus desired spacing from top (40px)
+                    const targetPosition = offsetTop - 40;
+                    
+                    // Try all scroll methods (iOS and Android compatible)
                     window.scrollTo(0, targetPosition);
                     document.documentElement.scrollTop = targetPosition;
                     document.body.scrollTop = targetPosition;
-                    window.scrollTo({ top: targetPosition, left: 0, behavior: 'auto' });
+                    window.scrollTo({ top: targetPosition, left: 0, behavior: 'smooth' });
                 };
                 
-                // Multiple attempts with increasing delays (Android keyboard timing)
+                // Multiple attempts with increasing delays (keyboard animation timing)
                 setTimeout(scrollToTop, 100);
                 setTimeout(scrollToTop, 200);
                 setTimeout(scrollToTop, 300);
