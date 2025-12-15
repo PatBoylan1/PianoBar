@@ -78,7 +78,16 @@
                         box-shadow 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
-        /* No sticky positioning needed - using auto-scroll instead */
+        /* Sticky positioning ONLY while typing (after auto-scroll) */
+        body.search-locked .search-container {
+            position: fixed;
+            top: 3px;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 3px 10px 10px 10px;
+            background-color: #000000;
+        }
 
         .search-input {
             width: 100%;
@@ -160,7 +169,10 @@
                 table-layout: fixed;
             }
             
-            /* Auto-scroll brings search to top naturally - no special positioning needed */
+            /* When search is locked, add padding to prevent content from going behind */
+            body.search-locked {
+                padding-top: 70px; /* Height of fixed search bar */
+            }
         }
 
         .songlist-table th,
@@ -516,7 +528,7 @@
             renderSongs();
         });
 
-        // Auto-scroll search bar to top when focused on mobile
+        // Auto-scroll search bar to top when focused, then lock it in place
         const searchInput = document.getElementById('searchInput');
         const searchContainer = document.querySelector('.search-container');
         
@@ -526,8 +538,17 @@
                 // Smooth scroll to bring search bar to top of viewport
                 setTimeout(() => {
                     searchContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // After scroll completes, lock the search bar in place
+                    setTimeout(() => {
+                        document.body.classList.add('search-locked');
+                    }, 300); // Wait for scroll animation to finish
                 }, 100); // Small delay to let keyboard animation start
             }
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            // Remove lock when keyboard closes
+            document.body.classList.remove('search-locked');
         });
 
         // Filter button click handlers
@@ -568,4 +589,4 @@
         loadSongs();
     </script>
 </body>
-</html>
+</
