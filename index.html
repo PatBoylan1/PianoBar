@@ -734,12 +734,14 @@
 
         // Add extra scroll on focus to show more of the table
         searchInput.addEventListener('focus', function() {
-            // Instant adjustment - scroll down 100px to move input higher on screen
-            const currentScroll = window.pageYOffset;
-            window.scrollTo({
-                top: currentScroll + 100,
-                behavior: 'smooth'
-            });
+            // Wait for browser's scroll-into-view, then adjust
+            setTimeout(() => {
+                const currentScroll = window.pageYOffset;
+                window.scrollTo({
+                    top: currentScroll + 150,
+                    behavior: 'smooth'
+                });
+            }, 200); // 200ms delay
         });
 
         // Live search - filter as user types
