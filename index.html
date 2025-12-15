@@ -24,8 +24,10 @@
             background-color: #000000;
             color: #ffffff;
             padding: 40px 20px 20px 20px;
-            max-width: 1200px;
+            max-width: 100%;
+            width: 100%;
             margin: 0 auto;
+            overflow-x: hidden;
         }
 
         h1 {
@@ -140,6 +142,8 @@
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            min-height: 0;
+            height: auto;
         }
 
         /* Song table styling - dark mode */
@@ -170,10 +174,14 @@
             /* When search is active, add padding to prevent content from going behind sticky elements */
             body.search-active {
                 padding-top: 0;
+                height: auto;
+                min-height: 100vh;
             }
             
             body.search-active .songlist-wrapper {
                 margin-top: 120px; /* Space for sticky search + sticky headers */
+                min-height: 0;
+                height: auto;
             }
         }
 
@@ -249,7 +257,9 @@
         /* Responsive design */
         @media (max-width: 768px) {
             body {
-                padding: 40px 15px 20px 15px;
+                padding: 40px 10px 20px 10px;
+                max-width: 100vw;
+                overflow-x: hidden;
             }
 
             h1 {
@@ -550,9 +560,7 @@
                 // Use requestAnimationFrame to ensure smooth animation
                 requestAnimationFrame(() => {
                     document.body.classList.add('search-active');
-                    // Hide filter buttons when search is active
-                    document.querySelector('.filter-buttons').style.display = 'none';
-                    document.querySelector('h1').style.display = 'none';
+                    // Keep filters and title visible - they'll be above the sticky search bar
                 });
             }
         });
@@ -560,9 +568,6 @@
         searchInput.addEventListener('blur', function() {
             // Remove sticky when not focused
             document.body.classList.remove('search-active');
-            // Show filter buttons again
-            document.querySelector('.filter-buttons').style.display = 'flex';
-            document.querySelector('h1').style.display = 'block';
         });
 
         // Filter button click handlers
