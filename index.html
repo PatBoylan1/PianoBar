@@ -506,11 +506,9 @@
             });
         }
 
-        // Live search - filter as user types
-        document.getElementById('searchInput').addEventListener('input', function() {
-            currentSearchTerm = this.value;
-            renderSongs();
-        });
+        // Track if search is active to prevent unwanted scrolling
+        let isSearchActive = false;
+        let scrollPosition = 0;
 
         // Auto-scroll search bar to top when focused on mobile
         const searchInput = document.getElementById('searchInput');
@@ -518,11 +516,38 @@
         
         searchInput.addEventListener('focus', function() {
             // Only auto-scroll on mobile (screen width < 768px)
-            if (window.innerWidth < 768) {
+            if (window.innerWidth < 768 && !isSearchActive) {
                 // Smooth scroll to bring search bar to top of viewport
                 setTimeout(() => {
                     searchContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Lock scroll position after scrolling
+                    setTimeout(() => {
+                        isSearchActive = true;
+                        scrollPosition = window.pageYOffset;
+                    }, 400); // Wait for smooth scroll to complete
                 }, 100); // Small delay to let keyboard animation start
+            }
+        });
+
+        searchInput.addEventListener('blur', function() {
+            // Reset when keyboard closes
+            isSearchActive = false;
+        });
+
+        // Live search - filter as user types WITHOUT scrolling
+        searchInput.addEventListener('input', function() {
+            currentSearchTerm = this.value;
+            
+            // Save current scroll position before rendering
+            if (isSearchActive) {
+                scrollPosition = window.pageYOffset;
+            }
+            
+            renderSongs();
+            
+            // Restore scroll position after rendering to prevent movement
+            if (isSearchActive) {
+                window.scrollTo(0, scrollPosition);
             }
         });
 
