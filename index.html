@@ -409,6 +409,11 @@
     </div>
 
     <script>
+        // Disable browser's automatic scroll restoration
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        
         let allSongs = [];
         let currentFilter = 'all';
         let currentSearchTerm = '';
@@ -748,22 +753,23 @@
                     document.body.scrollTop = 0;
                     window.scroll(0, 0);
                     
-                    // Also try with options object
-                    try {
-                        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-                    } catch (e) {
-                        // Fallback if scrollTo with options not supported
-                        window.scrollTo(0, 0);
-                    }
+                    // Update our tracking variable
+                    scrollPosition = 0;
                 };
                 
-                // Multiple attempts to ensure it works (Android keyboard timing)
-                scrollToTop(); // Immediate
-                setTimeout(scrollToTop, 50);
-                setTimeout(scrollToTop, 100);
-                setTimeout(scrollToTop, 200);
-                setTimeout(scrollToTop, 300);
-                setTimeout(scrollToTop, 500);
+                // Use requestAnimationFrame for better timing with browser rendering
+                requestAnimationFrame(() => {
+                    scrollToTop();
+                    // Multiple attempts with increasing delays (keyboard animation timing)
+                    requestAnimationFrame(scrollToTop);
+                    setTimeout(() => requestAnimationFrame(scrollToTop), 50);
+                    setTimeout(() => requestAnimationFrame(scrollToTop), 100);
+                    setTimeout(() => requestAnimationFrame(scrollToTop), 150);
+                    setTimeout(() => requestAnimationFrame(scrollToTop), 200);
+                    setTimeout(() => requestAnimationFrame(scrollToTop), 300);
+                    setTimeout(() => requestAnimationFrame(scrollToTop), 400);
+                    setTimeout(() => requestAnimationFrame(scrollToTop), 500);
+                });
             }
         });
 
