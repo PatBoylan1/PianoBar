@@ -439,13 +439,18 @@
             return matrix[len1][len2];
         }
 
+        // Normalize text: replace & with 'and' for consistent matching
+        function normalizeText(text) {
+            return text.replace(/&/g, ' and ').replace(/\s+/g, ' ').trim();
+        }
+
         // Hybrid search: TF-IDF + N-gram + Smart ranking
         function fuzzySearch(searchTerm, songs) {
             if (!searchTerm || searchTerm.trim() === '') {
                 return songs;
             }
 
-            const term = searchTerm.toLowerCase().trim();
+            const term = normalizeText(searchTerm.toLowerCase().trim());
             const searchWords = term.split(/\s+/).filter(w => w.length > 0);
             const results = [];
 
@@ -453,8 +458,8 @@
             const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with']);
 
             songs.forEach(song => {
-                const title = song.title.toLowerCase();
-                const artist = song.artist.toLowerCase();
+                const title = normalizeText(song.title.toLowerCase());
+                const artist = normalizeText(song.artist.toLowerCase());
                 const combined = title + ' ' + artist;
                 let score = 0;
                 let matchedWords = 0;
@@ -799,7 +804,7 @@
                 scrollOffset = 125;
                 delay = 200;
             } else if (isAndroid) {
-                scrollOffset = 50;
+                scrollOffset = 75;
                 delay = 400; // Android needs more time for keyboard animation
             }
             
