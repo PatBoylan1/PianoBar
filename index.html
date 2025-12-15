@@ -126,12 +126,11 @@
 
         /* Song table wrapper */
         .songlist-wrapper {
-            display: flex;
-            justify-content: center;
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            min-height: 70vh; /* Keep table large so search bar doesn't move when filtering */
+            padding-bottom: 60vh; /* Add space below table to keep search bar position stable */
+            display: block;
         }
 
         /* Song table styling - dark mode */
@@ -140,6 +139,7 @@
             width: 100%;
             max-width: 900px;
             table-layout: fixed;
+            margin: 0 auto; /* Center the table */
         }
 
         /* Mobile optimization - ensure table fits in viewport */
