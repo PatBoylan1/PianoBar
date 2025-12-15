@@ -70,7 +70,7 @@
             justify-content: center;
             margin-bottom: 30px;
             padding: 0 10px;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
         /* Sticky search when focused on mobile */
@@ -83,6 +83,7 @@
             background-color: #000000;
             margin-bottom: 0;
             padding: 3px 10px 10px 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .search-input {
@@ -156,6 +157,19 @@
             font-weight: bold;
             border-bottom: 2px solid #333333;
             background-color: #111111;
+        }
+
+        /* Sticky table headers when search is active on mobile */
+        .search-active .songlist-table thead {
+            position: sticky;
+            top: 60px;
+            z-index: 999;
+            transition: top 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .search-active .songlist-table th {
+            background-color: #000000;
+            border-top: 1px solid #333333;
         }
 
         .songlist-table tr:not(:first-child) td {
@@ -501,6 +515,7 @@
             // Only apply sticky on mobile (screen width < 768px)
             if (window.innerWidth < 768) {
                 searchContainer.classList.add('sticky');
+                document.body.classList.add('search-active');
                 // Hide filter buttons when search is active
                 document.querySelector('.filter-buttons').style.display = 'none';
                 document.querySelector('h1').style.display = 'none';
@@ -510,6 +525,7 @@
         searchInput.addEventListener('blur', function() {
             // Remove sticky when not focused
             searchContainer.classList.remove('sticky');
+            document.body.classList.remove('search-active');
             // Show filter buttons again
             document.querySelector('.filter-buttons').style.display = 'flex';
             document.querySelector('h1').style.display = 'block';
