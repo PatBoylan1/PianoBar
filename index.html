@@ -78,16 +78,7 @@
                         box-shadow 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
-        /* Sticky positioning ONLY while typing (after auto-scroll) */
-        body.search-locked .search-container {
-            position: fixed;
-            top: 3px;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 3px 10px 10px 10px;
-            background-color: #000000;
-        }
+        /* No sticky positioning - using min-height on table instead */
 
         .search-input {
             width: 100%;
@@ -140,8 +131,7 @@
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            min-height: 0;
-            height: auto;
+            min-height: 70vh; /* Keep table large so search bar doesn't move when filtering */
         }
 
         /* Song table styling - dark mode */
@@ -169,10 +159,7 @@
                 table-layout: fixed;
             }
             
-            /* When search is locked, add padding to prevent content from going behind */
-            body.search-locked {
-                padding-top: 70px; /* Height of fixed search bar */
-            }
+            /* No padding needed - no sticky positioning */
         }
 
         .songlist-table th,
@@ -528,7 +515,7 @@
             renderSongs();
         });
 
-        // Auto-scroll search bar to top when focused, then lock it in place
+        // Auto-scroll search bar to top when focused on mobile
         const searchInput = document.getElementById('searchInput');
         const searchContainer = document.querySelector('.search-container');
         
@@ -538,17 +525,8 @@
                 // Smooth scroll to bring search bar to top of viewport
                 setTimeout(() => {
                     searchContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    // After scroll completes, lock the search bar in place
-                    setTimeout(() => {
-                        document.body.classList.add('search-locked');
-                    }, 300); // Wait for scroll animation to finish
                 }, 100); // Small delay to let keyboard animation start
             }
-        });
-        
-        searchInput.addEventListener('blur', function() {
-            // Remove lock when keyboard closes
-            document.body.classList.remove('search-locked');
         });
 
         // Filter button click handlers
