@@ -78,18 +78,7 @@
                         box-shadow 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
-        /* Sticky search when focused on mobile */
-        body.search-active .search-container {
-            position: fixed;
-            top: 3px;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background-color: #000000;
-            margin-bottom: 0;
-            padding: 3px 10px 10px 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
+        /* No sticky positioning needed - using auto-scroll instead */
 
         .search-input {
             width: 100%;
@@ -171,18 +160,7 @@
                 table-layout: fixed;
             }
             
-            /* When search is active, add padding to prevent content from going behind sticky elements */
-            body.search-active {
-                padding-top: 0;
-                height: auto;
-                min-height: 100vh;
-            }
-            
-            body.search-active .songlist-wrapper {
-                margin-top: 120px; /* Space for sticky search + sticky headers */
-                min-height: 0;
-                height: auto;
-            }
+            /* Auto-scroll brings search to top naturally - no special positioning needed */
         }
 
         .songlist-table th,
@@ -199,19 +177,7 @@
             background-color: #111111;
         }
 
-        /* Sticky table headers when search is active on mobile */
-        .search-active .songlist-table thead {
-            position: sticky;
-            top: 60px;
-            z-index: 999;
-            transition: top 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
-        }
-
-        .search-active .songlist-table th {
-            background-color: #000000;
-            border-top: 1px solid #333333;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
+        /* No sticky headers needed with auto-scroll approach */
 
         .songlist-table tr:not(:first-child) td {
             border-bottom: 1px solid #222222;
@@ -550,24 +516,18 @@
             renderSongs();
         });
 
-        // Make search sticky on mobile when focused
+        // Auto-scroll search bar to top when focused on mobile
         const searchInput = document.getElementById('searchInput');
         const searchContainer = document.querySelector('.search-container');
         
         searchInput.addEventListener('focus', function() {
-            // Only apply sticky on mobile (screen width < 768px)
+            // Only auto-scroll on mobile (screen width < 768px)
             if (window.innerWidth < 768) {
-                // Use requestAnimationFrame to ensure smooth animation
-                requestAnimationFrame(() => {
-                    document.body.classList.add('search-active');
-                    // Keep filters and title visible - they'll be above the sticky search bar
-                });
+                // Smooth scroll to bring search bar to top of viewport
+                setTimeout(() => {
+                    searchContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100); // Small delay to let keyboard animation start
             }
-        });
-        
-        searchInput.addEventListener('blur', function() {
-            // Remove sticky when not focused
-            document.body.classList.remove('search-active');
         });
 
         // Filter button click handlers
