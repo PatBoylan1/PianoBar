@@ -70,7 +70,6 @@
         .search-container {
             display: flex;
             justify-content: center;
-            align-items: center;
             margin-bottom: 30px;
             padding: 0 10px;
             position: relative;
@@ -95,27 +94,6 @@
 
         .search-input::placeholder {
             color: #888888;
-        }
-
-        .search-clear {
-            position: absolute;
-            right: 20px;
-            background: transparent;
-            border: none;
-            color: #666666;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 8px;
-            line-height: 1;
-            opacity: 0.6;
-        }
-
-        .search-clear:hover {
-            opacity: 1;
-        }
-
-        .search-clear:active {
-            opacity: 0.4;
         }
 
         /* Error message row - hidden by default */
@@ -289,11 +267,6 @@
                 max-width: 100%;
                 font-size: 16px;
             }
-            
-            .search-clear {
-                right: 20px;
-                font-size: 22px;
-            }
 
             .error-message p {
                 font-size: 14px;
@@ -397,9 +370,8 @@
     </div>
 
     <!-- Search Bar -->
-    <div class="search-container" id="searchContainer">
+    <div class="search-container">
         <input type="text" class="search-input" id="searchInput" placeholder="Search for song">
-        <button class="search-clear" id="searchClear" style="display: none;">✕</button>
     </div>
 
     <!-- Song Table -->
@@ -753,46 +725,31 @@
             const rows = tbody.querySelectorAll('tr:not(.error-message):not(.spacer-row)');
             rows.forEach(row => row.remove());
 
-            // Special handling for Holiday filter
+            // Filter by category first
             let filteredSongs = allSongs;
-            
-            if (currentSearchTerm) {
-                // SPECIAL CASE: If in Holiday filter, search ONLY holiday songs
-                if (currentFilter === 'holiday') {
-                    const holidaySongs = allSongs.filter(song => 
-                        song.tags && song.tags.includes('holiday')
-                    );
-                    filteredSongs = fuzzySearch(currentSearchTerm, holidaySongs);
-                } else if (currentFilter === 'all') {
-                    // "All" filter: search ALL songs INCLUDING holiday
-                    filteredSongs = fuzzySearch(currentSearchTerm, allSongs);
-                } else {
-                    // Other filters (Country, Rock, etc): search ALL songs EXCEPT holiday
-                    const nonHolidaySongs = allSongs.filter(song => 
-                        !song.tags || !song.tags.includes('holiday')
-                    );
-                    filteredSongs = fuzzySearch(currentSearchTerm, nonHolidaySongs);
-                }
-            } else if (currentFilter !== 'all') {
-                // No search term, apply filter normally
+            if (currentFilter !== 'all') {
                 filteredSongs = allSongs.filter(song => 
                     song.tags && song.tags.includes(currentFilter)
                 );
             }
-            // else: No search, "All" filter: show all songs (allSongs already set)
+
+            // Apply search if there's a search term
+            if (currentSearchTerm) {
+                filteredSongs = fuzzySearch(currentSearchTerm, filteredSongs);
+            }
 
             // Show error if no results
             if (currentSearchTerm && filteredSongs.length === 0) {
                 errorMessage.classList.add('show');
+                document.getElementById('searchTerm').textContent = currentSearchTerm;
                 
-                // Different error message for Holiday filter
-                const errorText = document.getElementById('errorText');
-                const searchTermElement = document.getElementById('searchTerm');
-                
-                if (currentFilter === 'holiday') {
-                    errorText.innerHTML = `Pat doesn't know the holiday song<br><strong>${currentSearchTerm}</strong>`;
+                // Add filter context if a filter is active
+                const filterContext = document.getElementById('filterContext');
+                if (currentFilter !== 'all') {
+                    const filterName = currentFilter.charAt(0).toUpperCase() + currentFilter.slice(1).toLowerCase().replace(/-/g, ' ');
+                    filterContext.innerHTML = 'within <strong>' + filterName + '</strong>';
                 } else {
-                    errorText.innerHTML = `Pat doesn't know <strong id="searchTerm">${currentSearchTerm}</strong>`;
+                    filterContext.textContent = '';
                 }
             } else {
                 errorMessage.classList.remove('show');
@@ -873,28 +830,9 @@
         });
 
         // Live search - filter as user types
-        const searchClear = document.getElementById('searchClear');
-        
         searchInput.addEventListener('input', function() {
             currentSearchTerm = this.value;
-            
-            // Show/hide clear button
-            if (currentSearchTerm.length > 0) {
-                searchClear.style.display = 'block';
-            } else {
-                searchClear.style.display = 'none';
-            }
-            
             renderSongs();
-        });
-        
-        // Clear button click handler
-        searchClear.addEventListener('click', function() {
-            searchInput.value = '';
-            currentSearchTerm = '';
-            searchClear.style.display = 'none';
-            renderSongs();
-            searchInput.focus();
         });
 
 
