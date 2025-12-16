@@ -236,7 +236,7 @@
         .icon-buttons-cell {
             display: flex;
             gap: 8px;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: center;
         }
 
@@ -804,7 +804,7 @@
                     
                     // Venmo icon button
                     const venmoBtn = document.createElement('a');
-                    venmoBtn.href = `https://venmo.com/patrickTSG?txn=pay&amount=5&note=${encodeURIComponent(venmoNote)}`;
+                    venmoBtn.href = `https://venmo.me/patrickTSG?txn=pay&amount=5&note=${encodeURIComponent(venmoNote)}`;
                     venmoBtn.className = 'icon-btn venmo-btn';
                     venmoBtn.innerHTML = '<img src="venmo-icon.jpg" alt="Venmo" />';
                     
