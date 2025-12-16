@@ -936,10 +936,18 @@
                 showNotification(`No Venmo?<br>Bring cash to the piano<br>to request <strong>${songTitle}</strong>`, 4000);
             };
             
-            // Open button - go to Venmo profile
+            // Open button - open Venmo app to profile (no pre-population to avoid duplicate profiles)
             openBtn.onclick = function() {
                 dialog.classList.remove('show');
-                window.location.href = 'https://account.venmo.com/u/PatrickTSG';
+                // Open Venmo app to profile page only
+                window.location.href = 'venmo://users/PatrickTSG';
+                
+                // Show helpful message after attempting to open
+                setTimeout(() => {
+                    if (document.visibilityState === 'visible') {
+                        showNotification(`No Venmo?<br>Bring cash to the piano<br>to request <strong>${songTitle}</strong>`, 4000);
+                    }
+                }, 1000);
             };
             
             // Close dialog if clicking outside
