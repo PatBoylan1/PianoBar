@@ -684,16 +684,24 @@
         function generateFilterButtons() {
             const filterContainer = document.getElementById('filterButtons');
             
-            // Get unique categories from all songs
-            const categories = new Set();
+            // Get unique categories from all songs (case-insensitive)
+            const categoriesMap = new Map(); // lowercase -> original case
             allSongs.forEach(song => {
                 if (song.tags && Array.isArray(song.tags)) {
-                    song.tags.forEach(tag => categories.add(tag));
+                    song.tags.forEach(tag => {
+                        const lowerTag = tag.toLowerCase();
+                        // Keep the first capitalization we encounter
+                        if (!categoriesMap.has(lowerTag)) {
+                            categoriesMap.set(lowerTag, tag);
+                        }
+                    });
                 }
             });
             
-            // Convert to sorted array
-            const sortedCategories = Array.from(categories).sort();
+            // Convert to sorted array (by lowercase for consistent sorting)
+            const sortedCategories = Array.from(categoriesMap.entries())
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .map(entry => entry[1]); // Get original capitalization
             
             // Clear existing buttons
             filterContainer.innerHTML = '';
@@ -710,7 +718,7 @@
                 const button = document.createElement('button');
                 button.className = 'filter-btn';
                 button.setAttribute('data-filter', category);
-                button.textContent = category;
+                button.textContent = category.toUpperCase(); // Display in uppercase
                 filterContainer.appendChild(button);
             });
             
