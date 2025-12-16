@@ -763,8 +763,11 @@
                         song.tags && song.tags.includes('holiday')
                     );
                     filteredSongs = fuzzySearch(currentSearchTerm, holidaySongs);
+                } else if (currentFilter === 'all') {
+                    // "All" filter: search ALL songs INCLUDING holiday
+                    filteredSongs = fuzzySearch(currentSearchTerm, allSongs);
                 } else {
-                    // For all other filters: search ALL songs EXCEPT holiday songs
+                    // Other filters (Country, Rock, etc): search ALL songs EXCEPT holiday
                     const nonHolidaySongs = allSongs.filter(song => 
                         !song.tags || !song.tags.includes('holiday')
                     );
@@ -775,12 +778,8 @@
                 filteredSongs = allSongs.filter(song => 
                     song.tags && song.tags.includes(currentFilter)
                 );
-            } else {
-                // No search, "All" filter: show all songs EXCEPT holiday
-                filteredSongs = allSongs.filter(song => 
-                    !song.tags || !song.tags.includes('holiday')
-                );
             }
+            // else: No search, "All" filter: show all songs (allSongs already set)
 
             // Show error if no results
             if (currentSearchTerm && filteredSongs.length === 0) {
