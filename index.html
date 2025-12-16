@@ -765,7 +765,7 @@
                 if (currentFilter.toLowerCase() === 'holiday') {
                     console.log('🎄 IN HOLIDAY FILTER');
                     const holidaySongs = allSongs.filter(song => 
-                        song.tags && song.tags.includes('holiday')
+                        song.tags && song.tags.some(tag => tag.toLowerCase() === 'holiday')
                     );
                     console.log('🎄 Holiday songs available:', holidaySongs.length);
                     console.log('🎄 Holiday song titles:', holidaySongs.map(s => s.title));
@@ -780,7 +780,7 @@
                     console.log('🎸 IN OTHER FILTER:', currentFilter);
                     // Other filters (Country, Rock, etc): search ALL songs EXCEPT holiday
                     const nonHolidaySongs = allSongs.filter(song => 
-                        !song.tags || !song.tags.includes('holiday')
+                        !song.tags || !song.tags.some(tag => tag.toLowerCase() === 'holiday')
                     );
                     console.log('🎸 Non-holiday songs available:', nonHolidaySongs.length);
                     filteredSongs = fuzzySearch(currentSearchTerm, nonHolidaySongs);
