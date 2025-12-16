@@ -762,7 +762,7 @@
                 console.log('📊 ALL SONGS COUNT:', allSongs.length);
                 
                 // SPECIAL CASE: If in Holiday filter, search ONLY holiday songs
-                if (currentFilter === 'holiday') {
+                if (currentFilter.toLowerCase() === 'holiday') {
                     console.log('🎄 IN HOLIDAY FILTER');
                     const holidaySongs = allSongs.filter(song => 
                         song.tags && song.tags.includes('holiday')
@@ -771,7 +771,7 @@
                     console.log('🎄 Holiday song titles:', holidaySongs.map(s => s.title));
                     filteredSongs = fuzzySearch(currentSearchTerm, holidaySongs);
                     console.log('🎄 FINAL RESULTS:', filteredSongs.length, filteredSongs.map(s => s.title));
-                } else if (currentFilter === 'all') {
+                } else if (currentFilter.toLowerCase() === 'all') {
                     console.log('🌍 IN ALL FILTER');
                     // "All" filter: search ALL songs INCLUDING holiday
                     filteredSongs = fuzzySearch(currentSearchTerm, allSongs);
