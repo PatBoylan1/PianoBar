@@ -232,6 +232,62 @@
             white-space: nowrap;
         }
 
+        /* Android-style dialog modal */
+        .android-dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .android-dialog-overlay.show {
+            display: flex;
+        }
+
+        .android-dialog {
+            background-color: #ffffff;
+            border-radius: 8px;
+            width: 280px;
+            padding: 24px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .android-dialog-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 8px;
+        }
+
+        .android-dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .android-dialog-btn {
+            background: transparent;
+            border: none;
+            color: #1976D2;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .android-dialog-btn:active {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+
         /* Highlight search results */
         .highlight {
             background-color: #333333;
@@ -396,6 +452,17 @@
                 <tr class="spacer-row"><td colspan="3" style="height: 50px;">&nbsp;</td></tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Android-style dialog for Venmo -->
+    <div class="android-dialog-overlay" id="androidDialog">
+        <div class="android-dialog">
+            <div class="android-dialog-title">Open Venmo?</div>
+            <div class="android-dialog-buttons">
+                <button class="android-dialog-btn" id="dialogCancel">Cancel</button>
+                <button class="android-dialog-btn" id="dialogOpen">Open</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -761,35 +828,39 @@
                 artistCell.textContent = song.artist;
                 
                 const requestCell = document.createElement('td');
-                const requestLink = document.createElement('a');
                 
-                // Detect Android vs iOS for different Venmo links
+                // Detect Android vs iOS for different behaviors
                 const isAndroid = /Android/.test(navigator.userAgent);
                 const venmoNote = `Song Request: ${song.title} - ${song.artist}`;
                 
                 if (isAndroid) {
-                    // Android: Use Venmo.me link to avoid duplicate recipient issue
-                    requestLink.href = `https://venmo.me/patrickTSG?txn=pay&amount=5&note=${encodeURIComponent(venmoNote)}`;
+                    // Android: Show custom dialog
+                    const requestBtn = document.createElement('button');
+                    requestBtn.className = 'request-btn';
+                    requestBtn.textContent = 'Request';
+                    requestBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        showAndroidDialog(song.title);
+                    });
+                    requestCell.appendChild(requestBtn);
                 } else {
-                    // iOS: Use deep link
+                    // iOS: Use deep link (unchanged)
+                    const requestLink = document.createElement('a');
                     requestLink.href = `venmo://paycharge?txn=pay&recipients=patrickTSG&amount=5&note=${encodeURIComponent(venmoNote)}`;
+                    requestLink.className = 'request-btn';
+                    requestLink.textContent = 'Request';
+                    
+                    // Add click handler to detect if Venmo isn't installed
+                    requestLink.addEventListener('click', function(e) {
+                        setTimeout(() => {
+                            if (document.visibilityState === 'visible') {
+                                showNotification(`No Venmo?<br>Bring cash to the piano<br>to request <strong>${song.title}</strong>`, 4000);
+                            }
+                        }, 1000);
+                    });
+                    
+                    requestCell.appendChild(requestLink);
                 }
-                
-                requestLink.className = 'request-btn';
-                requestLink.textContent = 'Request';
-                
-                // Add click handler to detect if Venmo isn't installed
-                requestLink.addEventListener('click', function(e) {
-                    // Set a timeout to check if the app opened
-                    setTimeout(() => {
-                        // If still visible after attempting to open Venmo, show fallback
-                        if (document.visibilityState === 'visible') {
-                            showNotification(`No Venmo?<br>Bring cash to the piano<br>to request <strong>${song.title}</strong>`, 4000);
-                        }
-                    }, 1000);
-                });
-                
-                requestCell.appendChild(requestLink);
                 
                 row.appendChild(titleCell);
                 row.appendChild(artistCell);
@@ -835,6 +906,35 @@
             currentSearchTerm = this.value;
             renderSongs();
         });
+
+        // Show Android-style dialog
+        function showAndroidDialog(songTitle) {
+            const dialog = document.getElementById('androidDialog');
+            const cancelBtn = document.getElementById('dialogCancel');
+            const openBtn = document.getElementById('dialogOpen');
+            
+            // Show dialog
+            dialog.classList.add('show');
+            
+            // Cancel button - hide dialog and show cash notification
+            cancelBtn.onclick = function() {
+                dialog.classList.remove('show');
+                showNotification(`No Venmo?<br>Bring cash to the piano<br>to request <strong>${songTitle}</strong>`, 4000);
+            };
+            
+            // Open button - go to Venmo profile
+            openBtn.onclick = function() {
+                dialog.classList.remove('show');
+                window.location.href = 'https://account.venmo.com/u/PatrickTSG';
+            };
+            
+            // Close dialog if clicking outside
+            dialog.onclick = function(e) {
+                if (e.target === dialog) {
+                    dialog.classList.remove('show');
+                }
+            };
+        }
 
         // Custom notification function (replaces alert to avoid domain prefix)
         function showNotification(message, duration = 3000) {
